@@ -1,8 +1,8 @@
 package com.ssandri.dto;
 
 public class Category {
-  public Integer id;
-  public String name;
+  private Integer id;
+  private String name;
 
   public Integer getId() {
 

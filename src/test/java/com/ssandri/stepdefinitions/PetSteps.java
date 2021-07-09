@@ -13,6 +13,16 @@ public class PetSteps {
 
   private Response response;
 
+  @When("the service is requested to create a new pet named {string} with status {string}")
+  public void theServiceIsRequestedToCreateANewPetNamedWithStatus(String petName, String petStatus) {
+    response = given().body()
+        .when()
+        .get("https://petstore.swagger.io/v2/pet/findByStatus")
+        .then()
+        .extract()
+        .response();
+  }
+
   @When("the service is requested the list of pets that are {string}")
   public void theServiceIsRequestedTheListOfPetsThatAre(String expectedStatus) {
     response = given().queryParam("status", expectedStatus)
@@ -33,5 +43,10 @@ public class PetSteps {
             + " pets validations failed. There was at least one pet where it's status was different than ["
             + expectedStatus
             + "],");
+  }
+
+  @Then("the new pet should be created")
+  public void theNewPetShouldBeCreated() {
+
   }
 }
