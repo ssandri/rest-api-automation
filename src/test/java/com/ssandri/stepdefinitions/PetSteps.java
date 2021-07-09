@@ -1,7 +1,5 @@
 package com.ssandri.stepdefinitions;
 
-import static io.restassured.RestAssured.get;
-import static io.restassured.RestAssured.given;
 import static org.testng.Assert.*;
 
 import com.ssandri.dto.MessageResponse;
@@ -14,6 +12,7 @@ import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import io.restassured.response.Response;
 import java.util.List;
+import org.testng.asserts.SoftAssert;
 
 public class PetSteps {
 
@@ -79,38 +78,53 @@ public class PetSteps {
   @Then("the service should return a list of all pets that are {string}")
   public void theServiceShouldReturnAListOfAllPetsThatAre(String expectedStatus) {
 
+    SoftAssert softAssert = new SoftAssert();
     List<Pet> petList = response.jsonPath().getList(".", Pet.class);
-    assertTrue(petList.stream().allMatch(pet -> pet.getStatus().equals(expectedStatus)),
+
+    softAssert.assertEquals(response.getStatusCode(), 200);
+    softAssert.assertTrue(petList.stream().allMatch(pet -> pet.getStatus().equals(expectedStatus)),
         "Get "
             + expectedStatus
             + " pets validations failed. There was at least one pet where it's status was different than ["
             + expectedStatus
             + "],");
+    softAssert.assertAll();
   }
 
   @Then("the new pet should be created")
   public void theNewPetShouldBeCreated() {
 
+    SoftAssert softAssert = new SoftAssert();
     Pet responsePet = response.as(Pet.class);
-    assertEquals(responsePet.getName(), expectedPet.getName());
-    assertEquals(responsePet.getStatus(), expectedPet.getStatus());
+
+    softAssert.assertEquals(responsePet.getName(), expectedPet.getName());
+    softAssert.assertEquals(responsePet.getStatus(), expectedPet.getStatus());
+    softAssert.assertEquals(response.getStatusCode(), 200);
+    softAssert.assertAll();
   }
 
   @Then("the pet should change its status to {string}")
   public void thePetShouldChangeItsStatusTo(String expectedStatus) {
 
+    SoftAssert softAssert = new SoftAssert();
     Pet responsePet = response.as(Pet.class);
-    assertEquals(responsePet.getStatus(), expectedStatus);
+
+    softAssert.assertEquals(responsePet.getStatus(), expectedStatus);
+    softAssert.assertEquals(response.getStatusCode(), 200);
+    softAssert.assertAll();
 
   }
 
   @Then("the pet should no longer exist")
   public void thePetShouldNoLongerExist() {
 
-    assertEquals(response.getStatusCode(), 200);
+    SoftAssert softAssert = new SoftAssert();
     MessageResponse messageResponse = petResource.getPet(expectedPet.getId()).as(MessageResponse.class);
-    assertEquals(messageResponse.getCode(), 1);
-    assertEquals(messageResponse.getMessage(), "Pet not found");
-    assertEquals(messageResponse.getType(), "error");
+
+    softAssert.assertEquals(response.getStatusCode(), 200);
+    softAssert.assertEquals(messageResponse.getCode(), 1);
+    softAssert.assertEquals(messageResponse.getMessage(), "Pet not found");
+    softAssert.assertEquals(messageResponse.getType(), "error");
+    softAssert.assertAll();
   }
 }
