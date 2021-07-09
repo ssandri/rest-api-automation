@@ -95,9 +95,12 @@ public class PetSteps {
     SoftAssert softAssert = new SoftAssert();
     Pet responsePet = response.as(Pet.class);
 
-    softAssert.assertEquals(responsePet.getName(), expectedPet.getName());
-    softAssert.assertEquals(responsePet.getStatus(), expectedPet.getStatus());
-    softAssert.assertEquals(response.getStatusCode(), 200);
+    softAssert.assertEquals(response.getStatusCode(), 200,
+        "Create Pet response http status code validation failed.");
+    softAssert.assertEquals(responsePet.getName(), expectedPet.getName(),
+        "Create Pet response pet name validation failed.");
+    softAssert.assertEquals(responsePet.getStatus(), expectedPet.getStatus(),
+        "Create Pet response pet status validation failed.");
     softAssert.assertAll();
   }
 
@@ -107,8 +110,10 @@ public class PetSteps {
     SoftAssert softAssert = new SoftAssert();
     Pet responsePet = response.as(Pet.class);
 
-    softAssert.assertEquals(responsePet.getStatus(), expectedStatus);
-    softAssert.assertEquals(response.getStatusCode(), 200);
+    softAssert.assertEquals(response.getStatusCode(), 200,
+        "Update Pet response http status code validation failed.");
+    softAssert.assertEquals(responsePet.getStatus(), expectedStatus,
+        "Update Pet response pet status validation failed.");
     softAssert.assertAll();
 
   }
@@ -118,17 +123,24 @@ public class PetSteps {
 
     SoftAssert softAssert = new SoftAssert();
     MessageResponse deleteMessage = response.as(MessageResponse.class);
-    softAssert.assertEquals(response.getStatusCode(), 200);
-    softAssert.assertEquals(deleteMessage.getCode(), 200);
-    softAssert.assertEquals(deleteMessage.getMessage(), actualPet.getId().toString());
+    softAssert.assertEquals(response.getStatusCode(), 200,
+        "Delete response http status code validation failed.");
+    softAssert.assertEquals(deleteMessage.getCode(), 200,
+        "Delete response message code validation failed.");
+    softAssert.assertEquals(deleteMessage.getMessage(), actualPet.getId().toString(),
+        "Delete response message validation failed.");
 
     Response getPetResponse = petResource.getPet(actualPet.getId());
     MessageResponse getPetMessage = getPetResponse.as(MessageResponse.class);
 
-    softAssert.assertEquals(getPetResponse.getStatusCode(), 404);
-    softAssert.assertEquals(getPetMessage.getCode(), 1);
-    softAssert.assertEquals(getPetMessage.getMessage(), "Pet not found");
-    softAssert.assertEquals(getPetMessage.getType(), "error");
+    softAssert.assertEquals(getPetResponse.getStatusCode(), 404,
+        "Get Pet by id response http status code validation failed.");
+    softAssert.assertEquals(getPetMessage.getCode(), 1,
+        "Get Pet by id response message code validation failed.");
+    softAssert.assertEquals(getPetMessage.getMessage(),
+        "Pet not found", "Get Pet by id response message validation failed.");
+    softAssert.assertEquals(getPetMessage.getType(), "error",
+        "Get Pet by id response message type validation failed.");
     softAssert.assertAll();
   }
 }
