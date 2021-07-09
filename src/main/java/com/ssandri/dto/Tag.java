@@ -1,10 +1,10 @@
 package com.ssandri.dto;
 
 public class Tag {
-  private Integer id;
+  private Long id;
   private String name;
 
-  public Integer getId() {
+  public Long getId() {
 
     return id;
   }
