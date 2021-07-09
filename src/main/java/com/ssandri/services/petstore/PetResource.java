@@ -5,6 +5,7 @@ import static io.restassured.http.Method.DELETE;
 import static io.restassured.http.Method.GET;
 import static io.restassured.http.Method.POST;
 import static io.restassured.http.Method.PUT;
+import static io.restassured.parsing.Parser.*;
 
 import com.ssandri.dto.Pet;
 import io.restassured.builder.RequestSpecBuilder;
@@ -19,6 +20,7 @@ public class PetResource {
 
     baseURI = "https://petstore.swagger.io/v2";
     basePath = "/pet";
+    defaultParser = JSON;
     requestSpecification = new RequestSpecBuilder()
         .setContentType("application/json")
         .build();
@@ -38,7 +40,7 @@ public class PetResource {
   }
 
   public Response deletePet(Long id) {
-    return given().spec(requestSpecification).request(DELETE, "/{petId}", id);
+    return given().spec(requestSpecification).when().request(DELETE, "/{petId}", id);
   }
 
   public Response getPet(Long id) {

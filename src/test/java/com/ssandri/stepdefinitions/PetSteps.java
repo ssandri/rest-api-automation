@@ -1,7 +1,5 @@
 package com.ssandri.stepdefinitions;
 
-import static org.testng.Assert.*;
-
 import com.ssandri.dto.MessageResponse;
 import com.ssandri.dto.Pet;
 import com.ssandri.dto.Pet.Builder;
@@ -59,18 +57,18 @@ public class PetSteps {
 
   @When("the service is requested to update that pet to status {string}")
   public void theServiceIsRequestedToUpdateThatPetToStatus(String petStatus) {
-    expectedPet = new Pet
-        .Builder()
+
+    Pet modifiedPet = new Builder()
         .withName(actualPet.getName())
         .withId(actualPet.getId())
         .withStatus(petStatus)
         .build();
-    response = new PetResource().updatePet(expectedPet);
+    response = new PetResource().updatePet(modifiedPet);
   }
 
   @When("the service is requested to delete this pet")
   public void theServiceIsRequestedToDeleteThisPet() {
-    response = new PetResource().deletePet(expectedPet.getId());
+    response = new PetResource().deletePet(actualPet.getId());
   }
 
   // THEN STEPS
@@ -119,12 +117,18 @@ public class PetSteps {
   public void thePetShouldNoLongerExist() {
 
     SoftAssert softAssert = new SoftAssert();
-    MessageResponse messageResponse = petResource.getPet(expectedPet.getId()).as(MessageResponse.class);
-
+    MessageResponse deleteMessage = response.as(MessageResponse.class);
     softAssert.assertEquals(response.getStatusCode(), 200);
-    softAssert.assertEquals(messageResponse.getCode(), 1);
-    softAssert.assertEquals(messageResponse.getMessage(), "Pet not found");
-    softAssert.assertEquals(messageResponse.getType(), "error");
+    softAssert.assertEquals(deleteMessage.getCode(), 200);
+    softAssert.assertEquals(deleteMessage.getMessage(), actualPet.getId().toString());
+
+    Response getPetResponse = petResource.getPet(actualPet.getId());
+    MessageResponse getPetMessage = getPetResponse.as(MessageResponse.class);
+
+    softAssert.assertEquals(getPetResponse.getStatusCode(), 404);
+    softAssert.assertEquals(getPetMessage.getCode(), 1);
+    softAssert.assertEquals(getPetMessage.getMessage(), "Pet not found");
+    softAssert.assertEquals(getPetMessage.getType(), "error");
     softAssert.assertAll();
   }
 }
