@@ -7,6 +7,7 @@ import static org.testng.Assert.*;
 import com.ssandri.dto.MessageResponse;
 import com.ssandri.dto.Pet;
 import com.ssandri.dto.Pet.Builder;
+import com.ssandri.services.petstore.PetResource;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
@@ -16,6 +17,7 @@ import java.util.List;
 
 public class PetSteps {
 
+  private final PetResource petResource = new PetResource();
   private Response response;
   private Pet expectedPet;
   private Pet actualPet;
@@ -29,15 +31,8 @@ public class PetSteps {
         .withName(petName)
         .withStatus(petStatus)
         .build();
-    actualPet = given()
-        .body(newPet)
-        .contentType("application/json")
-        .when()
-        .post("https://petstore.swagger.io/v2/pet")
-        .then()
-        .extract()
-        .response()
-        .as(Pet.class);
+
+    actualPet = petResource.createPet(newPet).as(Pet.class);
   }
 
   @And("its status has been updated to {string}")
@@ -54,26 +49,13 @@ public class PetSteps {
         .withName(petName)
         .withStatus(petStatus)
         .build();
-    response = given()
-        .body(expectedPet)
-        .contentType("application/json")
-        .when()
-        .post("https://petstore.swagger.io/v2/pet")
-        .then()
-        .extract()
-        .response();
+
+    response = petResource.createPet(expectedPet);
   }
 
   @When("the service is requested the list of pets that are {string}")
   public void theServiceIsRequestedTheListOfPetsThatAre(String expectedStatus) {
-    response = given()
-        .queryParam("status", expectedStatus)
-        .contentType("application/json")
-        .when()
-        .get("https://petstore.swagger.io/v2/pet/findByStatus")
-        .then()
-        .extract()
-        .response();
+    response = petResource.findPetsByStatus(expectedStatus);
   }
 
   @When("the service is requested to update that pet to status {string}")
@@ -84,26 +66,12 @@ public class PetSteps {
         .withId(actualPet.getId())
         .withStatus(petStatus)
         .build();
-    response = given()
-        .body(expectedPet)
-        .contentType("application/json")
-        .when()
-        .put("https://petstore.swagger.io/v2/pet")
-        .then()
-        .extract()
-        .response();
+    response = new PetResource().updatePet(expectedPet);
   }
 
   @When("the service is requested to delete this pet")
   public void theServiceIsRequestedToDeleteThisPet() {
-    given()
-        .body(expectedPet)
-        .contentType("application/json")
-        .when()
-        .delete("https://petstore.swagger.io/v2/pet/{petId}", expectedPet.getId())
-        .then()
-        .extract()
-        .response();
+    response = new PetResource().deletePet(expectedPet.getId());
   }
 
   // THEN STEPS
@@ -140,12 +108,7 @@ public class PetSteps {
   public void thePetShouldNoLongerExist() {
 
     assertEquals(response.getStatusCode(), 200);
-    MessageResponse messageResponse = given()
-        .contentType("application/json")
-        .when()
-        .get("https://petstore.swagger.io/v2/pet/{petId}", expectedPet.getId())
-        .then()
-        .extract().response().as(MessageResponse.class);
+    MessageResponse messageResponse = petResource.getPet(expectedPet.getId()).as(MessageResponse.class);
     assertEquals(messageResponse.getCode(), 1);
     assertEquals(messageResponse.getMessage(), "Pet not found");
     assertEquals(messageResponse.getType(), "error");
