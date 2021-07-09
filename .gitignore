@@ -1,0 +1,13 @@
+#### Folders #####
+.gradle/
+build/
+.idea/
+target/
+out/
+report/
+
+#### Files #####
+!gradle-wrapper.jar
+.DS_Store
+*.iml
+.project
