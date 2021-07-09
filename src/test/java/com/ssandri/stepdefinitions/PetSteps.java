@@ -4,6 +4,8 @@ import static io.restassured.RestAssured.given;
 import static org.testng.Assert.*;
 
 import com.ssandri.dto.Pet;
+import com.ssandri.dto.Pet.Builder;
+import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import io.restassured.response.Response;
@@ -13,11 +15,35 @@ public class PetSteps {
 
   private Response response;
   private Pet expectedPet;
+  private Pet actualPet;
+
+  // GIVEN STEPS
+
+  @Given("that exists a pet named {string} with status {string}")
+  public void thatExistsAPetNamedWithStatus(String petName, String petStatus) {
+
+    Pet newPet = new Builder()
+        .withName(petName)
+        .withStatus(petStatus)
+        .build();
+    actualPet = given()
+        .body(newPet)
+        .contentType("application/json")
+        .when()
+        .post("https://petstore.swagger.io/v2/pet")
+        .then()
+        .extract()
+        .response()
+        .as(Pet.class);
+  }
+
+  // WHEN STEPS
 
   @When("the service is requested to create a new pet named {string} with status {string}")
   public void theServiceIsRequestedToCreateANewPetNamedWithStatus(String petName, String petStatus) {
     expectedPet = new Pet
-        .Builder(petName)
+        .Builder()
+        .withName(petName)
         .withStatus(petStatus)
         .build();
     response = given()
@@ -42,6 +68,26 @@ public class PetSteps {
         .response();
   }
 
+  @When("the service is requested to update that pet to status {string}")
+  public void theServiceIsRequestedToUpdateThatPetToStatus(String petStatus) {
+    expectedPet = new Pet
+        .Builder()
+        .withName(actualPet.getName())
+        .withId(actualPet.getId())
+        .withStatus(petStatus)
+        .build();
+    response = given()
+        .body(expectedPet)
+        .contentType("application/json")
+        .when()
+        .put("https://petstore.swagger.io/v2/pet")
+        .then()
+        .extract()
+        .response();
+  }
+
+  // THEN STEPS
+
   @Then("the service should return a list of all pets that are {string}")
   public void theServiceShouldReturnAListOfAllPetsThatAre(String expectedStatus) {
 
@@ -60,5 +106,13 @@ public class PetSteps {
     Pet responsePet = response.as(Pet.class);
     assertEquals(responsePet.getName(), expectedPet.getName());
     assertEquals(responsePet.getStatus(), expectedPet.getStatus());
+  }
+
+  @Then("the pet should change its status to {string}")
+  public void thePetShouldChangeItsStatusTo(String expectedStatus) {
+
+    Pet responsePet = response.as(Pet.class);
+    assertEquals(responsePet.getStatus(), expectedStatus);
+
   }
 }

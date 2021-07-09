@@ -43,15 +43,23 @@ public class Pet {
   }
 
   public static class Builder {
+    private Long id;
     private Category category;
-    private final String name;
+    private String name;
     private List<String> photoUrls;
     private List<Tag> tags;
     private String status;
 
-    public Builder(String name) {
+    public Builder withName(String name) {
 
       this.name = name;
+      return this;
+    }
+
+    public Builder withId(Long id) {
+
+      this.id = id;
+      return this;
     }
 
     public Builder withCategory(Category category) {
@@ -81,6 +89,7 @@ public class Pet {
     public Pet build() {
 
       Pet pet = new Pet();
+      pet.id = this.id;
       pet.category = this.category;
       pet.name = this.name;
       pet.photoUrls = this.photoUrls;
