@@ -12,12 +12,19 @@ import java.util.List;
 public class PetSteps {
 
   private Response response;
+  private Pet expectedPet;
 
   @When("the service is requested to create a new pet named {string} with status {string}")
   public void theServiceIsRequestedToCreateANewPetNamedWithStatus(String petName, String petStatus) {
-    response = given().body()
+    expectedPet = new Pet
+        .Builder(petName)
+        .withStatus(petStatus)
+        .build();
+    response = given()
+        .body(expectedPet)
+        .contentType("application/json")
         .when()
-        .get("https://petstore.swagger.io/v2/pet/findByStatus")
+        .post("https://petstore.swagger.io/v2/pet")
         .then()
         .extract()
         .response();
@@ -25,7 +32,9 @@ public class PetSteps {
 
   @When("the service is requested the list of pets that are {string}")
   public void theServiceIsRequestedTheListOfPetsThatAre(String expectedStatus) {
-    response = given().queryParam("status", expectedStatus)
+    response = given()
+        .queryParam("status", expectedStatus)
+        .contentType("application/json")
         .when()
         .get("https://petstore.swagger.io/v2/pet/findByStatus")
         .then()
@@ -48,5 +57,8 @@ public class PetSteps {
   @Then("the new pet should be created")
   public void theNewPetShouldBeCreated() {
 
+    Pet responsePet = response.as(Pet.class);
+    assertEquals(responsePet.getName(), expectedPet.getName());
+    assertEquals(responsePet.getStatus(), expectedPet.getStatus());
   }
 }
