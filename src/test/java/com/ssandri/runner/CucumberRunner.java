@@ -7,7 +7,6 @@ import org.testng.annotations.Test;
 @Test
 @CucumberOptions(
     features = {"src/test/resources/features/"},
-    tags = "@test",
     glue = {"com.ssandri.stepdefinitions"},
     plugin = {
         "pretty",
