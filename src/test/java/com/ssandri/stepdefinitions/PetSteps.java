@@ -1,10 +1,13 @@
 package com.ssandri.stepdefinitions;
 
+import static io.restassured.RestAssured.get;
 import static io.restassured.RestAssured.given;
 import static org.testng.Assert.*;
 
+import com.ssandri.dto.MessageResponse;
 import com.ssandri.dto.Pet;
 import com.ssandri.dto.Pet.Builder;
+import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -35,6 +38,11 @@ public class PetSteps {
         .extract()
         .response()
         .as(Pet.class);
+  }
+
+  @And("its status has been updated to {string}")
+  public void itsStatusHasBeenUpdatedTo(String petStatus) {
+    this.theServiceIsRequestedToUpdateThatPetToStatus(petStatus);
   }
 
   // WHEN STEPS
@@ -86,6 +94,18 @@ public class PetSteps {
         .response();
   }
 
+  @When("the service is requested to delete this pet")
+  public void theServiceIsRequestedToDeleteThisPet() {
+    given()
+        .body(expectedPet)
+        .contentType("application/json")
+        .when()
+        .delete("https://petstore.swagger.io/v2/pet/{petId}", expectedPet.getId())
+        .then()
+        .extract()
+        .response();
+  }
+
   // THEN STEPS
 
   @Then("the service should return a list of all pets that are {string}")
@@ -114,5 +134,20 @@ public class PetSteps {
     Pet responsePet = response.as(Pet.class);
     assertEquals(responsePet.getStatus(), expectedStatus);
 
+  }
+
+  @Then("the pet should no longer exist")
+  public void thePetShouldNoLongerExist() {
+
+    assertEquals(response.getStatusCode(), 200);
+    MessageResponse messageResponse = given()
+        .contentType("application/json")
+        .when()
+        .get("https://petstore.swagger.io/v2/pet/{petId}", expectedPet.getId())
+        .then()
+        .extract().response().as(MessageResponse.class);
+    assertEquals(messageResponse.getCode(), 1);
+    assertEquals(messageResponse.getMessage(), "Pet not found");
+    assertEquals(messageResponse.getType(), "error");
   }
 }
