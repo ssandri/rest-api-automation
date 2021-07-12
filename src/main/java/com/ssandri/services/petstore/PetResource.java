@@ -9,6 +9,7 @@ import static io.restassured.parsing.Parser.*;
 
 import com.ssandri.dto.Pet;
 import com.ssandri.utils.RestAssuredFilter;
+import io.qameta.allure.restassured.AllureRestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
@@ -26,6 +27,7 @@ public class PetResource {
     requestSpecification = new RequestSpecBuilder()
         .setContentType("application/json")
         .addFilter(new RestAssuredFilter())
+        .addFilter(new AllureRestAssured())
         .build();
   }
 

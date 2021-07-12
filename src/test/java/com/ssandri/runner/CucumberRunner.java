@@ -12,7 +12,8 @@ import org.testng.annotations.Test;
     plugin = {
         "pretty",
         "json:build/test-results/cucumber/cucumber.json",
-        "json:build/test-results/cucumber/results.cucumber"
+        "json:build/test-results/cucumber/results.cucumber",
+        "io.qameta.allure.cucumber6jvm.AllureCucumber6Jvm"
     })
 public class CucumberRunner extends AbstractTestNGCucumberTests {
 
