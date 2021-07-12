@@ -55,7 +55,7 @@ To run tests, run the following command
 
 ### Logs
 
-Each test scenarios execution will generate a log file inside the folder `logs`
+Each test scenario execution will generate a log file inside the folder `logs`
 
 ## Reporting
 
@@ -75,4 +75,4 @@ To generate the execution report execute, after running the test, the following 
 
 This command will open a report in your system default browser containing a detailed report for the execution, all HTTP calls will have a detailed request and response log attached to the step.
 
-In order to end the command simply input ``TRL+C` in your terminal.
+In order to end the command simply input `CTRL+C` in your terminal.
