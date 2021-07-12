@@ -5,6 +5,7 @@ build/
 target/
 out/
 report/
+logs/
 
 #### Files #####
 !gradle-wrapper.jar

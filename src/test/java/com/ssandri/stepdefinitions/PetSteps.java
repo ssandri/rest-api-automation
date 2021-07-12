@@ -1,5 +1,7 @@
 package com.ssandri.stepdefinitions;
 
+import static org.testng.Assert.*;
+
 import com.ssandri.dto.MessageResponse;
 import com.ssandri.dto.Pet;
 import com.ssandri.dto.Pet.Builder;
@@ -10,6 +12,7 @@ import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import io.restassured.response.Response;
 import java.util.List;
+import org.testng.Assert;
 import org.testng.asserts.SoftAssert;
 
 public class PetSteps {
@@ -76,10 +79,10 @@ public class PetSteps {
   @Then("the service should return a list of all pets that are {string}")
   public void theServiceShouldReturnAListOfAllPetsThatAre(String expectedStatus) {
 
+    assertEquals(response.getStatusCode(), 200,
+        "Get Pet by status response http status code validation failed.");
     SoftAssert softAssert = new SoftAssert();
     List<Pet> petList = response.jsonPath().getList(".", Pet.class);
-
-    softAssert.assertEquals(response.getStatusCode(), 200);
     softAssert.assertTrue(petList.stream().allMatch(pet -> pet.getStatus().equals(expectedStatus)),
         "Get "
             + expectedStatus
@@ -92,11 +95,11 @@ public class PetSteps {
   @Then("the new pet should be created")
   public void theNewPetShouldBeCreated() {
 
+    assertEquals(response.getStatusCode(), 200,
+        "Create Pet response http status code validation failed.");
     SoftAssert softAssert = new SoftAssert();
     Pet responsePet = response.as(Pet.class);
 
-    softAssert.assertEquals(response.getStatusCode(), 200,
-        "Create Pet response http status code validation failed.");
     softAssert.assertEquals(responsePet.getName(), expectedPet.getName(),
         "Create Pet response pet name validation failed.");
     softAssert.assertEquals(responsePet.getStatus(), expectedPet.getStatus(),
@@ -107,11 +110,10 @@ public class PetSteps {
   @Then("the pet should change its status to {string}")
   public void thePetShouldChangeItsStatusTo(String expectedStatus) {
 
+    assertEquals(response.getStatusCode(), 200,
+        "Update Pet response http status code validation failed.");
     SoftAssert softAssert = new SoftAssert();
     Pet responsePet = response.as(Pet.class);
-
-    softAssert.assertEquals(response.getStatusCode(), 200,
-        "Update Pet response http status code validation failed.");
     softAssert.assertEquals(responsePet.getStatus(), expectedStatus,
         "Update Pet response pet status validation failed.");
     softAssert.assertAll();
@@ -121,10 +123,10 @@ public class PetSteps {
   @Then("the pet should no longer exist")
   public void thePetShouldNoLongerExist() {
 
+    assertEquals(response.getStatusCode(), 200,
+        "Delete response http status code validation failed.");
     SoftAssert softAssert = new SoftAssert();
     MessageResponse deleteMessage = response.as(MessageResponse.class);
-    softAssert.assertEquals(response.getStatusCode(), 200,
-        "Delete response http status code validation failed.");
     softAssert.assertEquals(deleteMessage.getCode(), 200,
         "Delete response message code validation failed.");
     softAssert.assertEquals(deleteMessage.getMessage(), actualPet.getId().toString(),
@@ -133,7 +135,7 @@ public class PetSteps {
     Response getPetResponse = petResource.getPet(actualPet.getId());
     MessageResponse getPetMessage = getPetResponse.as(MessageResponse.class);
 
-    softAssert.assertEquals(getPetResponse.getStatusCode(), 404,
+    assertEquals(getPetResponse.getStatusCode(), 404,
         "Get Pet by id response http status code validation failed.");
     softAssert.assertEquals(getPetMessage.getCode(), 1,
         "Get Pet by id response message code validation failed.");

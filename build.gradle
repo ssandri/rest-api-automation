@@ -23,7 +23,9 @@ dependencies {
     testImplementation 'io.cucumber:cucumber-java:6.10.4'
     testImplementation 'io.cucumber:cucumber-testng:6.10.4'
     testImplementation 'com.google.code.gson:gson:2.8.7'
-
+    implementation 'ch.qos.logback:logback-classic:1.2.3'
+    implementation 'ch.qos.logback:logback-core:1.2.3'
+    implementation 'org.slf4j:slf4j-api:1.7.31'
 }
 
 testlogger {
